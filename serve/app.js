@@ -6,6 +6,8 @@ const path = require('path');
 
 const app = express();
 
+// app.set('secret', require('./key.js'));
+
 // 处理 post 数据
 app.use(bodyParser.json());
 // 解决跨域

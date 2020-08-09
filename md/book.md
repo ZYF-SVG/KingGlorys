@@ -193,6 +193,35 @@ vue.use(Input);
 
 ```
 
+侧边栏内容为：
+
+```js
+- 内容管理
+  - 新建分类
+  - 分类列表
+
+  - 新建物品
+  - 物品列表
+
+  - 新建英雄
+  - 英雄列表
+
+  - 新建文章
+  - 文章列表
+
+- 运营管理
+  - 新建广告位
+  - 广告位列表
+
+- 系统管理
+  - 新建管理员
+  - 管理员列表
+
+
+```
+
+
+
 
 
 然后，修改路由配置，router > index.js， 当访问 / 时，就显示 Main.vue 组件。
@@ -821,6 +850,751 @@ rest/item
 之前就有的事件，点击按钮，进行表单数据的提交；之前就把他改成的上传到 Item 集合中了，所以不用修改什么了，**但**：
 
 可以添加物品，不添加 图标吗？ 试试，可以的
+
+
+
+## 7. 新建 HeroEdit.vue  和 HeroList.vue 文件
+
+英雄页面
+
+### 1. HeroEdit.vue
+
+在英雄添加，编辑页面中分为2个 tabs 一个为 基本的信息 一个为 技能信息；
+
+![英雄编辑和添加](H:\javascript\Vue.js\KingGlorys\md\img\英雄编辑和添加.png)
+
+![英雄技能](H:\javascript\Vue.js\KingGlorys\md\img\英雄技能.png)
+
+1、基本信息的结构为：
+
+```html
+<el-tab-pane label="基本信息" name="first">
+  <!-- 名称 -->
+  <el-form-item label="名称" prop="name">
+    <el-input v-model="activityForm.name"></el-input>
+  </el-form-item>
+  <!-- 头像 -->
+  <el-form-item label="头像">
+    <el-upload
+      class="avatar-uploader"
+      :action="uploadHttp"
+      :show-file-list="false"
+      :on-success="handleAvatarSuccess">
+      <img v-if="activityForm.avatar" :src="activityForm.avatar" class="avatar">
+      <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+    </el-upload>
+  </el-form-item>
+  <!-- 称号 -->
+  <el-form-item label="称号">
+    <el-input v-model="activityForm.title"></el-input>
+  </el-form-item>
+  <!-- 职位 -->
+  <el-form-item label="职位">
+    <el-select v-model="activityForm.categories" multiple placeholder="请选择">
+      <el-option v-for="item in categories" :key="item._id" :label="item.name" :value="item._id">
+      </el-option>
+    </el-select>
+  </el-form-item>
+  <!-- 评分 -->
+  <el-form-item label="难度">
+    <el-rate v-model="activityForm.scores.difficult" show-score :max="9"></el-rate>
+  </el-form-item>
+  <el-form-item label="技能">
+    <el-rate v-model="activityForm.scores.skills" show-score :max="9"></el-rate>
+  </el-form-item>
+  <el-form-item label="攻击">
+    <el-rate v-model="activityForm.scores.attack" show-score :max="9"></el-rate>
+  </el-form-item>
+  <el-form-item label="生存">
+    <el-rate v-model="activityForm.scores.survive" show-score :max="9"></el-rate>
+  </el-form-item>
+  <!-- 顺风出装 -->
+  <el-form-item label="顺风出装">
+    <el-select v-model="activityForm.item1" multiple placeholder="请选择">
+      <el-option
+        v-for="item in items"
+        :key="item._id"
+        :label="item.name"
+        :value="item._id">
+      </el-option>
+    </el-select>
+  </el-form-item>
+  <!-- 逆风出装 -->
+  <el-form-item label="逆风出装">
+    <el-select v-model="activityForm.item2" multiple placeholder="请选择">
+      <el-option
+        v-for="item in items"
+        :key="item._id"
+        :label="item.name"
+        :value="item._id">
+      </el-option>
+    </el-select>
+  </el-form-item>
+  <!-- 使用技巧 -->
+  <el-form-item label="使用技巧">
+    <el-input
+      type="textarea"
+      placeholder="请输入内容"
+      v-model="activityForm.usageTips"
+      autosize>
+    </el-input>
+  </el-form-item>
+  <!-- 对抗技巧 -->
+  <el-form-item label="对抗技巧">
+    <el-input
+      type="textarea"
+      placeholder="请输入内容"
+      v-model="activityForm.battleTips"
+      autosize>
+    </el-input>
+  </el-form-item>
+  <!-- 使用技巧 -->
+  <el-form-item label="团战思路">
+    <el-input
+      type="textarea"
+      placeholder="请输入内容"
+      v-model="activityForm.teamTips"
+      autosize>
+    </el-input>
+  </el-form-item>
+</el-tab-pane>
+```
+
+2、技能的基本结构为：
+
+使用 for 循环，渲染出多个 el-col 列，循环的数据源为 `activityForm.skills` 为一个空数组
+
+```html
+<el-row type="flex" style="flex-wrap: wrap;">
+    <el-col :md="12" v-for="(item, i) in activityForm.skills" :key="i">
+      <!-- 名称 -->
+      <el-form-item label="名称">
+        <el-input v-model="item.name"></el-input>
+      </el-form-item>
+      <!-- 图标 -->
+      <el-form-item label="图标">
+        <!-- 把函数直接写在了 html 里，因为这是在 for 循环中，item 是当前向，写在里面比较方便
+        又因为，单纯的把图片的路径给 item.icon 不能显示出来，使用使用 $set 来设置； -->
+        <el-upload
+          class="avatar-uploader"
+          :action="uploadHttp"
+          :show-file-list="false"
+          :on-success="(res) => { $set(item, 'icon', res); }">
+          <img v-if="item.icon" :src="item.icon" class="avatar">
+          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        </el-upload>
+      </el-form-item>
+      <!-- 技能描述 -->
+      <el-form-item label="技能描述">
+        <el-input type="textarea" placeholder="请输入内容" v-model="item.description" autosize>
+        </el-input>
+      </el-form-item>
+        <!-- 小提示 -->
+      <el-form-item label="小提示">
+        <el-input placeholder="请输入内容" v-model="item.tips" autosize>
+        </el-input>
+      </el-form-item>
+      <!-- 删除按钮 -->
+      <el-form-item>
+        <el-button type="danger" @click="activityForm.skills.splice(i, 1)" style="margin-top: 0;">删除</el-button>
+      </el-form-item>
+    </el-col>
+  </el-row>
+```
+
+data 数据：
+
+```js
+  // 绑定表单数据
+  activityForm: {
+    skills: []
+  },
+```
+
+原来什么都没有的，点击 添加技能按钮，给这个数组，添加一个空对象，就会循环出一个技能的填写区域出来；
+
+```html
+ <el-button type="primary" @click="addSkill">添加技能</el-button>
+
+<script>
+	// 点击添加技能按钮触发
+    addSkill () {
+      this.activityForm.skills.push({});
+    }
+</script>
+```
+
+然后，循环里的 item 就是  `activityForm.skills` 这个值。我们在 技能添加区域 使用 v-model 绑定对应的值；
+
+不用改变上传图片的请求，但要修改上传图片后，触发的函数，我们发生图片，会返回一串 图片的地址；所以呢，我们要添加到 技能图标 的 src 上；触发函数中，是给 `item.icon` 添加值，所以函数还是写在 标签 上面会比较好：
+
+```html
+  <!-- 图标 -->
+  <el-form-item label="图标">
+    <!-- 把函数直接写在了 html 里，因为这是在 for 循环中，item 是当前向，写在里面比较方便
+    又因为，单纯的把图片的路径给 item.icon 不能显示出来，使用使用 $set 来设置； -->
+    <el-upload
+      class="avatar-uploader"
+      :action="uploadHttp"
+      :show-file-list="false"
+      :on-success="(res) => { $set(item, 'icon', res); }">
+      <img v-if="item.icon" :src="item.icon" class="avatar">
+      <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+    </el-upload>
+  </el-form-item>
+```
+
+使用 `$set` 是为了防止 图标 在页面中显示不出来；
+
+
+
+### 2. HeroList.vue
+
+和上一个基本一样；
+
+
+
+## 8. 新建 articleEdit.vue  和 articleList.vue
+
+编辑，添加文章 和 文章列表：
+
+![文章页面](H:\javascript\Vue.js\KingGlorys\md\img\文章页面.png)
+
+编辑，添加文章 使用到了富文本编辑器：
+
+- 富文本编辑器： 在 admin 里使用 
+
+  我们使用 <a href="https://www.vue2editor.com/guide.html">vue2Editor</a> 这个插件：
+
+  **下载**：
+
+  ```js
+  npm install vue2-editor
+  ```
+
+  **局部配置基本使用**：
+
+  ```html
+  <template>
+    <div>
+        <!-- 组件占位符 -->
+        <vue-editor v-model="富文本编辑器绑定的内容"></vue-editor>    
+    </div>
+  </template>
+  
+  <script>
+      // 导入
+      import { VueEditor } from "vue2-editor";
+      // 注册组件
+      export default {
+      	components: { VueEditor }
+      };
+  </script>
+  ```
+
+  **配置上传图片**：
+
+  在我们还没有设置，上传图片时， 你在富文本编辑器中，添加图片，这个图片会被转成 倍s64什么什么的格式，存储在篇文章的数据中，这样虽然不用上传图片；但是，接口请求的 数据太过大；导致请求上传不了，报错 ：
+
+  ```js
+  PayloadTooLargeError: request entity too large
+  => 
+  PayloadTooLargeError:请求实体太大
+  ```
+
+  所以我们要上传图片，然后在读取图片的在 服务器的路径，然后渲染数据，这样比较好；
+
+  我们就要使用到  <a href="https://www.vue2editor.com/guide.html">vue2Editor</a>  的上传图片功能了：
+
+  1、在标签上添加一个属性 和 一个方法，告诉富文本编辑器 我们要自己设置图片
+
+  ```html
+  <vue-editor id="editor" useCustomImageHandler @imageAdded="handleImageAdded" v-model="htmlForEditor"> </vue-editor>
+  ```
+
+  2，在上传图片时，触发函数 `imageAdded` 但是，但是，这里有一个坑，**就是函数不能使用 驼峰命名 法的方式 来命名，不然不能触发函数的；** 要改变成这个 `image-added`：
+
+  ```js
+  // 富文本编辑器的图片上传函数
+  async handleImageAdded (file, Editor, cursorLocation, resetUploader) {
+    const formData = new FormData();
+    // 第一个 file 是我们上传图片时，返回的格式；
+    formData.append('file', file);
+  
+    // 上传图片的请求
+    const res = await this.$http.post('upload', formData);
+    // 这里接收的 res 是不确定的，你要输出来看看，要得到 图片的路径，我这里是  res.data
+    // image 是图片的格式吗 哈哈
+    Editor.insertEmbed(cursorLocation, 'image', res.data);
+    resetUploader();
+  }
+  ```
+
+  这样就可以了
+
+  ![富文本编辑器上传图片](H:\javascript\Vue.js\KingGlorys\md\img\富文本编辑器上传图片.png)
+
+  ![地址也改变了](H:\javascript\Vue.js\KingGlorys\md\img\地址也改变了.png)
+
+。
+
+
+
+![文章列表](H:\javascript\Vue.js\KingGlorys\md\img\文章列表.png)
+
+
+
+
+
+## 9. 新建 AdsEdit.vue  和 AdsList.vue
+
+广告位页面，广告位有很多，有页面的轮播图区，有列表的形式，有图片的形式 等等。。
+
+![广告位的添加](H:\javascript\Vue.js\KingGlorys\md\img\广告位的添加.png)
+
+一个广告位有多个 子广告，比如： 首页幻灯片广告有
+
+- 图片；
+- 点击图片的跳转地址；
+
+
+
+![广告位的列表](H:\javascript\Vue.js\KingGlorys\md\img\广告位的列表.png)
+
+
+
+
+
+## 10. 新建 adminUserEdit.vue  和 adminUserList.vue
+
+管理员账号管理
+
+后端先，建 admin_user.js 集合，然后导出，我们再创建2个服务端文件；内容为：
+
+![新建管理员](H:\javascript\Vue.js\KingGlorys\md\img\新建管理员.png)
+
+
+
+![管理员列表](H:\javascript\Vue.js\KingGlorys\md\img\管理员列表.png)
+
+关于管理员的密码安全，所以要使用密码加密：在后端接口进行加密处理，在 AdminUser.js 集合中，进行处理，而不是在 处理函数体中；
+
+**加密**：
+
+是在 管理员集合中进行处理的；
+
+set 就是数据要存储前执行的函数；
+
+![加密](H:\javascript\Vue.js\KingGlorys\md\img\加密.png)
+
+设置 select 为 false 后，编辑页面就没有查出 密码，然后提交时，我以为会提交一个空密码呢，会改变数据库里的密码，但不会的；
+
+![select为false](H:\javascript\Vue.js\KingGlorys\md\img\select为false.png)
+
+证明： 
+
+把 select 设置为 true，然后点击编辑用户，查看用户加密后的密码，然后再设置为 false；然后添加用户；
+
+```js
+// $2a$10$oHrqmnvyWj0qmEMQpPZBpejdUeC7OPxGc14VMOhWvjl/7BNjaxXxu
+
+// $2a$10$oHrqmnvyWj0qmEMQpPZBpejdUeC7OPxGc14VMOhWvjl/7BNjaxXxu
+```
+
+在次点击编辑用户，然后把 select设置为 true，查看 密码会不会和之前的一样，答案是会；
+
+
+
+## 11. 新建 Login.vue 登录页面
+
+![登录页面](H:\javascript\Vue.js\KingGlorys\md\img\登录页面.png)
+
+重点：
+
+- 主要是 app 和 整个页面的body 的高度为 0，展示不了背景图片了，所以可以给他们都添加 `height: 100vh`;
+- 把 获取到的 token 存储到 浏览器中；
+
+```html
+<!-- 登录页面 -->
+<template>
+  <div class="login_content">
+    <el-card>
+      <h2>请先登录</h2>
+      <el-form @submit.native.prevent="logins" :model="model">
+        <el-form-item label="用户名">
+          <el-input v-model="model.username"></el-input>
+        </el-form-item>
+        <el-form-item label="密码">
+          <el-input v-model="model.password"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" native-type="submit">登录</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+  </div>
+</template>
+
+<script>
+export default {
+  data () {
+    return {
+      model: {}
+    };
+  },
+  methods: {
+    // 点击登录按钮，触发表单提交事件
+    async logins () {
+      const { data: res } = await this.$http.post('login', this.model);
+      // 把 token 存储到浏览器的 localStorage 中；
+      localStorage.setItem('token', res.token);
+      // 跳转到后台管理页面
+      this.$router.push('/');
+      // 提示用户登录成功
+      this.$message.success(`欢迎登录 ${res.name}`);
+    }
+  }
+};
+</script>
+
+<style lang="less">
+.login_content {
+  height: 100vh;
+  background: url(../../../public/background.jpeg) no-repeat left top;
+  background-size: 100%;
+  .el-card {
+    position: absolute;
+    top: 8rem;
+    left: 50%;
+    width: 30rem;
+    height: 23rem;
+    transform: translateX(-50%);
+    opacity: .8;
+  }
+}
+</style>
+
+```
+
+![获取不到password](H:\javascript\Vue.js\KingGlorys\md\img\获取不到password.png)
+
+因为在之前，设置管理用户集合时，设置 密码 select 为 false，所以根据用户 名，查取不到 密码，在查询语句后添加 `select('+password')；`就可以查询到了。
+
+![select+](H:\javascript\Vue.js\KingGlorys\md\img\select+.png)
+
+
+
+
+
+**错误处理**：
+
+如果，用户不存在，不是在 login.vue 中提示的，一般是在 axios 的拦截响应 中处理的；
+
+http > axios.js
+
+```js
+// 配置 axios
+import axios from 'axios';
+import vue from 'vue';
+
+const http = axios.create({
+  baseURL: 'http://localhost:3000/admin/api'
+});
+
+// 响应拦截
+http.interceptors.response.use(config => {
+  // 正确时，执行
+  return config;
+}, err => {
+  // 当响应错误时，执行
+  vue.prototype.$message.error(err.response.data.message);
+  return Promise.reject(err);
+});
+
+// 注意导出语句
+export default http;
+
+```
+
+在 axios.js 里是获取不到 vue 中的 $message 方法的，所以要导入 vue，然后获取 vue 的全局属性？，你可以输出看看：
+
+![在别的文件中，获取到vue里的方法](H:\javascript\Vue.js\KingGlorys\md\img\在别的文件中，获取到vue里的方法.png)
+
+
+
+
+
+## 12. 登录拦截
+
+要是发起的请求的请求头中，没有携带 token 的话，就重定向到 登录页面；用户没有登录就不能访问 后台管理页面，大概就是这样，操作要点赋值：
+
+### 1. 客户端 设置请求拦截器
+
+在 axios 设置 请求拦截器，把 token 携带在请求头中：
+
+admin > http > axios.js
+
+```js
+// 请求拦截
+http.interceptors.request.use(config => {
+  // 添加请求头
+  const token = localStorage.getItem('token');
+  // 并判断，如果 token 存在才发起请求， Bearer 后面有一个空格
+  if (token) {
+    config.headers.Authorization = 'Bearer ' + token;
+  }
+  return config;
+});
+```
+
+
+
+### 2. 服务端接收请求头
+
+服务端接收请求头，井进行 解析，把解析出来的 数据（因为我们之前把 用户的 id ，使用  jsonwebtoken 加密成一个 token，所以解析出来的是一个 用户 id； 并到 数据库里进行查找，看看是否有这个用户；
+
+serve > router > admin.js 
+
+1. 获取 前端传递过来的 token：如果为 空，就报错，前端的响应拦截器，会拦截到的；
+
+   ```js
+    // 登录拦截
+     app.use('/admin', (req, res, next) => {
+       // 判断是否有发送 token，要是前端没有发送 token，这里的 token 的 .split 方法
+       // 就会报错。不是在整个 语句后添加 ||, 是在里面。
+      const token = (req.headers.authorization || '').split(' ').pop();
+       if (token == null) {
+         return res.status(401).send({
+           message: 'token为空'
+         })
+       }
+       next();
+     })
+   ```
+
+2. token 存在，就解析出 id；如果没有 id 就报错；
+
+   ```js
+   // token 存在，就解析出 id，到数据库找用户是否存在, tokenDate就是当前登录用户的信息；
+   // 解析 token 中加密的 id，如果 解析出来的数据里没有，包含 id，也报错，可以会有人使用伪造的 token
+   const tokenDate = jwt.verify(token, require('../key'));
+   if (!tokenDate) {
+     return res.status(401).send({
+       message: 'token中不存在用户id'
+     })
+   }
+   ```
+
+   ![token 中的用户id](H:\javascript\Vue.js\KingGlorys\md\img\token 中的用户id.png)
+
+
+
+3. 根据解析出来的id，到数据库里进行查询，如果没有用户报错；
+
+   ```js
+   // 在数据库里查询用户信息，如果不存在改用户，就报错；
+   const data = await AdminUser.findById({_id: tokenDate.id});
+   if (!data) {
+     return res.status(401).send({
+       message: '用户不存在'
+     })
+   }
+   ```
+
+
+
+4. 整体代码：
+
+   ```js
+    // 登录拦截
+     app.use('/admin', async (req, res, next) => {
+       // 判断是否有发送 token，没有就为 null
+       const token = req.headers.authorization.split(' ').pop();
+       if (token == null) {
+         return res.status(401).send({
+           message: 'token为空'
+         })
+       }
+       // token 存在，就解析出 id，到数据库找用户是否存在, tokenDate就是当前登录用户的信息；
+       // 解析 token 中加密的 id，如果 解析出来的数据里没有，包含 id，也报错，可以会有人使用伪造的 token
+       const tokenDate = jwt.verify(token, require('../key'));
+       if (!tokenDate) {
+         return res.status(401).send({
+           message: 'token中不存在用户id'
+         })
+       }
+       // 在数据库里查询用户信息，如果不存在改用户，就报错；
+       const data = await AdminUser.findById({_id: tokenDate.id});
+       if (!data) {
+         return res.status(401).send({
+           message: '用户不存在'
+         })
+       }
+       next();
+     })
+   ```
+
+   
+
+5. 但是呢，每次都要使用到判断，然后返回错误信息，这个我们可以使用一个 插件 `http-assert` 简化判断：
+
+   下载：
+
+   ```js
+   npm install http-assert
+   ```
+
+   替换 if 判断：
+
+   ```js
+   app.use('/admin', async (req, res, next) => {
+       // 判断是否有发送 token，没有就为 null，注意判断 token 不存在就为 空字符串；
+       let token = (req.headers.authorization || '').split(' ').pop();
+       assert(token, 401, 'token为空');
+       // if (token == null) {
+       //   return res.status(401).send({
+       //     message: 'token为空'
+       //   })
+       // }
+   ```
+
+   修改后结构为：
+
+   ```js
+   // 登录拦截
+     app.use('/admin', async (req, res, next) => {
+       // 判断是否有发送 token，没有就为 null
+       const token = (req.headers.authorization || '').split(' ').pop();
+       assert(token, 401, 'token为空');
+   
+       // token 存在，就解析出 id，到数据库找用户是否存在, tokenDate就是当前登录用户的信息；
+       // 解析 token 中加密的 id，如果 解析出来的数据里没有，包含 id，也报错，可以会有人使用伪造的 token
+       const tokenDate = jwt.verify(token, require('../key'));
+       assert(tokenDate, 401, 'token中不存在用户id');
+   
+       // 在数据库里查询用户信息，如果不存在改用户，就报错；然后把查取到是用户信息，存储到 
+       // req.user 里面；
+       req.user = await AdminUser.findById({_id: tokenDate.id});
+       assert(req.user, 401, '请先登录');
+   
+       next();
+     })
+   ```
+
+   
+
+   然后要使用 错误处理中间件 来向 客户端返回错误信息：
+
+   ```js
+   ....................  
+   
+     // 错误处理中间件
+     app.use((err, req, res, next) => {
+       // 要添加多一个状态码，要不然，前端的响应拦截器，没有获取到这个 状态码，会报错
+       res.status(err.statusCode).send({
+         message: err.message
+       })
+     })
+   ```
+
+   写在最底部；
+
+6. 前端要根据我们返回的状态码，来决定，是否用户登录了的，比如，状态码为 401 就是用户没有登录，就重定向到 login 登录页面；在 axios 响应拦截器中设置：
+
+   ```js
+   http > axios.js
+   
+   import router from '../router/index';
+   
+   // 响应拦截
+   http.interceptors.response.use(config => {
+     // 正确时，执行
+     return config;
+   }, err => {
+     // 当响应错误时，执行, 所以，在后端，返回信息时，必须携带 message 自动，这样
+     // 前端，可以获取到错误的信息；
+     vue.prototype.$message.error(err.response.data.message);
+   
+     //  401 状态码，就重定向到 login 页面；
+     if (err.response.status === 401) {
+       // TypeError: Cannot read property '_route' of undefined 访问不到，所以引进 router 模块
+       router.push('/login');
+     }
+     return Promise.reject(err);
+   });
+   ```
+
+   这样，在没有 token 就不能访问 后台管理页面了；
+
+
+
+### 3. 前端设置路由守卫
+
+![设置路由守卫](H:\javascript\Vue.js\KingGlorys\md\img\设置路由守卫.png)
+
+因为，服务端的登录拦截 是要发起请求才会进行拦截，要是 后台管理页面 有一个不用发送请求，那 服务端的登录拦截 就没有作用了 。所以要设置 路由守卫 。
+
+```js
+http > axios.js
+
+// 路由导航守卫
+router.beforeEach((to, from, next) => {
+  if (to.path === '/login') return next();
+  const tokenStr = localStorage.getItem('token');
+  if (!tokenStr) return next('/login');
+  next();
+});
+```
+
+
+
+## 13. 设置图片上传的 请求头
+
+如果在每个页面上，使用 `headers` 属性获取 token 的值，有时，会获取到了，但发起请求时，没有携带在头部，使用使用别的方法 ；
+
+```js
+// 创建全局的属性 和 方法，各个组件都可以调用
+Vue.mixin({
+  // 计算属性
+  computed: {
+    // 上传图片的路由地址
+    uploaUrl () {
+      return 'http://localhost:3000/admin/api/upload';
+    }
+  },
+  methods: {
+    // 设置上传图片的 头部
+    getToken () {
+      return {
+        Authorization: 'Bearer ' + localStorage.getItem('token')
+      };
+    }
+  }
+});
+```
+
+这样，在每个组件中，就可以怎么使用：
+
+在装备上：
+
+```html
+ <el-form-item label="图标">
+        <el-upload
+          class="avatar-uploader"
+          :action="uploaUrl"
+          :show-file-list="false"
+          :headers="getToken()"
+          :on-success="handleAvatarSuccess">
+          <img v-if="activityForm.icon" :src="activityForm.icon" class="avatar">
+          <i v-else class="el-icon-plus avatar-uploader-icon"></i>
+        </el-upload>
+
+        <!-- 设置按钮为 原生的提交按钮 -->
+        <el-button type="primary" plain native-type="submit">保存</el-button>
+      </el-form-item>
+```
+
+
 
 
 
@@ -1613,77 +2387,197 @@ app.use('/public',express.static(path.join(__dirname, 'public')));
 
 
 
-7.31
+## 14. 创建英雄集合
 
-heros 英雄管理
-
-avatar 头像；name
-
-英雄集合 Hero 集合
-
-称号： title，
-
-职位：categories 下拉框，管理 category，有可能 2个, 用 数组括分类，就可以有多个关联职位；
-
-评分：
+如下显示，因为一个字段要是想要有多个值，外层要用 数组包裹：
 
 ```js
-scores: {
-	difficult: Number,  
-    skills：
-    attack：
-    survive：
+// 英雄集合
+const mongoose = require('mongoose');
+
+const heroSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'name是必填项']
+  },
+  // 头像
+  avatar: { type: String },
+  // 称号
+  title: { type: String },
+  // 职位, 多个职位，使用数组包裹对象，就可以添加多个 关联职位
+  categories: [{type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
+  // 评分
+  scores: {
+    difficult: { type: Number },  // 难度
+    skills: { type: Number },     // 技能
+    attack: { type: Number },     // 攻击
+    survive: { type: Number }     // 生存
+  },
+  // 技能,有多个技能，所以使用数组括对象
+  skills: [{
+    icon: { type: String },
+    name: { type: String },
+    description: { type: String },
+    tips: { type: String }
+  }],
+  // 顺风出装,应有多个装备，所以用...
+  item1: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item' }],
+  // 逆风出装
+  item2: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Item'}],
+  // 使用技巧
+  usageTips: { type: String },
+  // 对抗技巧
+  battleTips: { type: String },
+  // 团战思路
+  teamTips: { type: String },
+  // 搭档英雄
+  partners: [{
+    hero: { type: mongoose.Schema.Types.ObjectId, ref: 'Hero' },
+    description: { type: String }
+  }]
+})
+
+const Hero = mongoose.model('Hero', heroSchema);
+
+module.exports = Hero
+```
+
+
+
+## 15. 创建文章集合
+
+```js
+// 文章集合
+const mongoose = require('mongoose');
+
+const articleSchema = new mongoose.Schema({
+  // 文章标题
+  title: { type: String },
+  // 文章类别
+  categories: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
+  // 文章内容
+  body: { type: String }
+})
+
+const Article = mongoose.model('Article', articleSchema);
+
+module.exports = Article;
+```
+
+
+
+## 16. 创建广告位集合
+
+```js
+// 广告位集合
+const mongoose = require('mongoose');
+
+const adSchema = new mongoose.Schema({
+  name: { type: String },
+  items: [{
+    image: { type: String },
+    url: { type: String }
+  }]
+})
+
+const Ad = mongoose.model('Ad', adSchema);
+
+module.exports = Ad
+```
+
+
+
+
+
+## 17. 新建管理员集合
+
+使用到了加密操作：
+
+```js
+// 管理员集合
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs')
+
+const adminUserSchema = new mongoose.Schema({
+  username: { type: String },
+  password: { 
+    type: String,
+    select: false, // 数据库操作时，都不会操作到他，比如查取 和 修改 都不会修改到他；
+    // 因为在编辑管理员账号时，查取的是 加密的密码，然后点击保存按钮，会把 加密密码进行再次加密，
+    // 就不是我们原来的密码了。所以使用 false 来不然他查出来 。
+    set (val) {
+      // val 用户提交的数据
+      return bcrypt.hashSync(val, 10);
+    }
+  }
+})
+
+const AdminUser = mongoose.model('AdminUser', adminUserSchema);
+
+module.exports = AdminUser;
+```
+
+
+
+## 18. 登录接口
+
+router > admin.js
+
+添加处理登录操作的接口；
+
+```js
+// 登录路由
+app.post('/admin/api/login', require('./admin/login'));
+```
+
+router > admin > login.js
+
+向数据库查询用户是否存在，不存在向前端返回错误信息和状态码；
+
+```js
+module.exports = async (req, res) => {
+  // 导入 管理员集合
+  const AdminUser = require('../../model/AdminUser');
+  const { username, password } = req.body;
+
+  // 根据用户名找用户
+  // 因为在管理员集合中 password 字段使用了 select：false，所以是查取不到他的，所以可以
+  // 在 查询语句的末尾添加 select('+password');
+  const user = await AdminUser.findOne({username}).select('+password');
+
+  if (!user) {
+    // 如果没有就为 null
+    return res.status(422).send({
+      message: '用户不存在'
+    })
+  }
+
+  // 2. 校验密码, 返回一个 布尔值
+  const isValid = require('bcryptjs').compareSync(password, user.password);
+  if (!isValid) {
+    // 密码不一致, 422 登录失败，使用 422状态码；
+    return res.status(422).send({
+      message: '密码错误'
+    })
+  }
+
+  // 3. 返回 token
+  const jwt = require('jsonwebtoken');
+  const token = jwt.sign({id: user._id}, require('../../key.js'));
+  res.send({
+    token,
+    name: user.username
+  })
 }
-```
 
-技能： skills
 
-```js
-skills:[{
-    icon: {type: String},
-    name: {}   名陈
-    description: 描述
-    tips： 提示
-}]
-```
-
-装配 items
-
-```js
-item1: [{
-    type: mongooes id ref: Item
-}]
-item2: [{
-    type: mongooes id ref: Item
-}]
-```
-
-使用技巧： usageTips
-
-```js
-usageTips: {type: String}
-```
-
-对抗技巧： battleTips
-
-团战思路： teamTips
-
-搭档： partners
-
-```js
-partners: [{
-    hero:   搭档英雄 和 英雄集合关联
-    descripttion: 描述
-}]
 ```
 
 
 
-fetchCategories()  获取分类数据；类型要可以多选，
 
-assign对象的替代方法；使用评分组件，
 
-装配： 要多选
+401 用户的
 
 
 
@@ -1790,5 +2684,55 @@ activityForm.parent, 这个值，没有写在 data 的 activityForm 中，因为
       },
     }
  }
+```
+
+
+
+3.在别的文件中，然后获取 父文件中的 app
+
+是这样的：
+
+app.js
+
+```js
+// 服务端的主程序
+const express = require('express');
+
+const app = express();
+
+app.set('secret', require('./key.js')); // 这个
+
+// 导入 admin.js, 并传递 app 给他
+require('./router/admin.js')(app);
+
+app.listen(3000, () => {
+  console.log('http://localhost:3000');
+})
+```
+
+
+
+router > admin.js
+
+```js
+module.exports = app => {
+
+ // 可以获取到
+ console.log(app.get('secret'));
+    
+ // 登录路由
+ app.post('/admin/api/login', require('./admin/login'));
+}
+```
+
+在 login 文件中，想要获取到 现在这个页面的 app，要什么获取呢？
+
+router > admin > login.js
+
+```js
+module.exports = (req, res) => {
+ // 可以获取到
+ console.log(app.get('secret'));  // 没有这个 app
+}
 ```
 

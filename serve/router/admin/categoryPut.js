@@ -3,7 +3,7 @@ module.exports = async (req, res) => {
   // const category = require('../../model/Category');
 
   const data = await req.model.updateOne({_id: req.params.id}, req.body);
-  
+  console.log(data);
   res.send({
     "data": data,
     "meta": {

@@ -1,4 +1,4 @@
-<!-- 新建分类 -->
+<!-- 物品分类 -->
 <template>
   <div class="item_content">
     <h1> {{id ? '修改' : '新建'}}物品</h1>
@@ -10,8 +10,9 @@
       <el-form-item label="图标">
         <el-upload
           class="avatar-uploader"
-          :action="uploadHttp"
+          :action="uploaUrl"
           :show-file-list="false"
+          :headers="getToken()"
           :on-success="handleAvatarSuccess">
           <img v-if="activityForm.icon" :src="activityForm.icon" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
@@ -45,8 +46,6 @@ export default {
       },
       // 存储获取的 分类数据
       parents: {},
-      // 存储上传图片时，发起的请求地址
-      uploadHttp: 'http://localhost:3000/admin/api/upload'
     };
   },
   created () {

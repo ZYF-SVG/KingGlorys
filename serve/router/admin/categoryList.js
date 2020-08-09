@@ -16,6 +16,8 @@ module.exports = async (req, res) => {
   // req.model.modelName： 获取集合的名称
   if (req.model.modelName === 'Category') {
     queryOptions.populate = 'parent';
+  } else if (req.model.modelName === 'Hero') {
+    queryOptions.populate = 'categories';
   }
   const data = await req.model.find().setOptions(queryOptions);
 

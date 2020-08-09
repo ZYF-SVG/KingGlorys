@@ -5,6 +5,13 @@
     <el-table :data="items">
       <el-table-column prop="_id" label="ID" width="250"></el-table-column>
       <el-table-column prop="name" label="物品名称"></el-table-column>
+      <el-table-column prop="categories" label="职位">
+        <template slot-scope="scope">
+          <span v-for="item in scope.row.categories" :key="item._id">
+            {{item.name}}
+          </span>
+        </template>
+      </el-table-column>
       <el-table-column prop="avatar" label="图标">
         <template slot-scope="scope">
           <img :src="scope.row.avatar || noiocn " alt="未上传图标" style="width: 4rem; height: 4rem;">
