@@ -10,6 +10,8 @@ const heroSchema = new mongoose.Schema({
   avatar: { type: String },
   // 称号
   title: { type: String },
+  // 展示图片
+  banner: { type: String },
   // 职位, 多个职位，使用数组包裹对象，就可以添加多个 关联职位
   categories: [{type: mongoose.Schema.Types.ObjectId, ref: 'Category' }],
   // 评分
@@ -23,6 +25,8 @@ const heroSchema = new mongoose.Schema({
   skills: [{
     icon: { type: String },
     name: { type: String },
+    cooling: { type: String },
+    consume: { type: String },
     description: { type: String },
     tips: { type: String }
   }],
@@ -43,6 +47,6 @@ const heroSchema = new mongoose.Schema({
   }]
 })
 
-const Hero = mongoose.model('Hero', heroSchema);
+const Hero = mongoose.model('Hero', heroSchema, 'heroes');
 
 module.exports = Hero

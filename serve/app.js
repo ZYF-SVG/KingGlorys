@@ -24,5 +24,5 @@ require('./router/web.js')(app);
 require('./model/connent.js')(app);
 
 app.listen(3000, () => {
-  console.log('http://localhost:3000');
+  console.log('http://192.168.31.240:3000/');
 })

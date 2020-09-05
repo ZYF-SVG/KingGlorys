@@ -1598,6 +1598,467 @@ Vue.mixin({
 
 
 
+# 4. web 端
+
+## 1. 工具样式 和 sass
+
+定义一些同样的类名，
+
+下载 sass 解析包，scss 在 main.js 里引入文件
+
+
+
+## 2. 样式重置
+
+style.scss
+
+```scss
+* {
+    box-sizing: border-box;
+    outline: none; //高亮
+}
+
+html {
+    font-size: 13px; 
+    // 页面最多的大小；
+}
+
+body {
+    margin: 0;
+    font-famil: Arial, Helveitca, sans-swif;
+    line-height: 1.2em;
+    background: #f1f1f1;
+}
+a {
+    color: #999;
+}
+```
+
+
+
+
+
+## 3. 网站色彩 和 字体定义
+
+整体方面的；
+
+定义变量
+
+``` {
+$colors: (
+	"primary": 橘黄色; // 主要颜色
+    "white": #fff,
+    "Light": #f9f9f9,
+    "grey": #999,
+    "dark-1": #333,
+    "dark": #222,
+    "black": #000,
+);
+// 循环生成 字体和背景颜色
+@each $colorkey, $color in $colors {
+    .text-#{$colorkey} {
+        color: $color;
+    }
+    .bg-#{$colorkey} {
+        background-color: $color;
+    }
+}
+
+
+// text
+// 文字的对齐方式,循环配置
+@each $var in (left, conter, right) {
+    .text-#{$var} {
+        text-align: $val;
+    }
+}
+
+// fon size
+// 基础的字体大小, 转换为 rem
+$base-font-size: 13px; 
+$font-size: (
+    xs: 10px,
+    sm: 12px,
+    md: 13px,
+    lg: 14px;
+    xl: 16px;
+);
+@each $sizekye, $size in $font-size {
+    .fs-#{$sizekey} {
+        font-size: $size * $base-font-size;
+    }
+}
+
+// flex
+.d-flex {
+    display: flex;
+}
+.flex-column {
+    flex-direction: column,
+}
+$flex-jc: (
+	start: flex-start,
+    emd: flex-end,
+    center: center,
+    between: space-between,
+    aroud: spce-around,
+);
+@each $key, $value in $flex-jc {
+  .jc-#{$key} {
+    justify-content: $value;
+  }
+}
+    
+$flex-ai: (
+	start: flex-start,
+    emd: flex-end,
+    center: center,
+    stretch: stretch,
+);
+$each $key, $value $flex-ai {
+    .ai-#{$key} {
+        align-items: $value;
+        }   
+    }
+.flex-1 {
+    flex: 1;
+}
+.flex-grow-1 {
+	flex-grow: 1;
+}
+
+// 外边距的设置
+有全部方向的
+有左右方向的
+有上下方向的
+他们各自有各自的大小
+0-5 
+.mt-1 => margin top 1级
+$spacing-types: (m: margin, p: padding);
+$spacing-directions:(
+	t: top,
+	r: right,
+	b: bottom,
+	l: left,
+);
+$spacing-base-size: 1rem;
+$spacing-sizes: (
+	0: 0,
+	1: 0.25,
+	2: 0.5,
+	3: 1,
+	4: 1.5,
+	5. 3
+)
+```
+
+
+
+## 4. Main.vue 
+
+导航条 和 上部分的下载提示部分，下面部分为 3个组件，首页，攻略中心，赛事中心 。
+
+### 1. 下载提示：
+
+```html
+<!-- 顶部下载 -->
+<div class="bg-black d-flex py-1 px-2">
+  <!-- logo -->
+  <img class="logo" src="../../assets/logo.png" alt="">
+  <div class="logo_title mx-1 text-white fs-sm flex-1">
+    <p>王者荣耀</p>
+    <p class="fs-xs text-grey-1">团队成就更多</p>
+  </div>
+  <button type="button" class="btn bg-primary fs-xs">立即下载</button>
+</div>
+```
+
+
+
+
+
+### 2. 导航条：
+
+```html
+我自己的结构：
+<!-- 导航栏 -->
+<div class="bg-primary" style="height: 1.111111rem;">
+  <ul class="d-flex jc-around ai-center text-white">
+    <li class="active">首页</li>
+    <li>攻略中心</li>
+    <li>赛事中心</li>
+  </ul>
+</div>
+
+老师的：
+ <!-- 导航栏 -->
+<div class="bg-primary py-1">
+  <div class="nav text-white d-flex jc-around">
+    <div class="nev-item active">
+      <router-link class="nav-link" tag="div" to="/">首页</router-link>
+    </div>
+    <div class="nev-item">
+      <router-link class="nav-link" tag="div" to="/hone">攻略中心</router-link>
+    </div>
+    <div class="nev-item">
+      <router-link class="nav-link" tag="div" to="/dsdf">赛事中心</router-link>
+    </div>
+  </div>
+</div>
+```
+
+
+
+## 5. Home.vue
+
+### 1. 轮播图
+
+轮播图我使用的是  **[ vue-swiper](https://github.com/zwhGithub/vue-swiper)** 
+
+代码为：
+
+```html
+<!-- 轮播图 -->
+    <Swiper :autoPlay='false'>
+       <Slide>
+         <img class="w-100" src="../../assets/images/6db1bc82007c5dacf854419fea538d3a.jpeg" alt="">
+       </Slide>
+       <Slide>
+         <img class="w-100" src="../../assets/images/6db1bc82007c5dacf854419fea538d3a.jpeg" alt="">
+       </Slide>
+       <Slide>
+         <img class="w-100" src="../../assets/images/6db1bc82007c5dacf854419fea538d3a.jpeg" alt="">
+       </Slide>
+    </Swiper>
+```
+
+
+
+### 2. 列表
+
+```html
+new-icons
+```
+
+
+
+icon-font
+
+
+
+## 6. 封装简单的 卡片 组件
+
+封装卡片组件，只传递 icon 和 每个卡片 的标题；
+
+1，创建组件：
+
+components > public > Card.vue
+
+```html
+<!-- 卡片组件 -->
+<template>
+  <div>
+    <div class="card mt-2 p-2 bg-white">
+      <div class="card-head d-flex pb-2">
+        <!-- 标题图标 -->
+        <i class="font_family mr-1" :class="`${icon}`" ></i>
+        <!-- 标题 -->
+        <span class="fs-xl flex-1">{{title}}</span>
+        <i class="font_family icon-caidan"></i>
+      </div>
+      <div class="card-body mt-1">
+        <!-- 插槽，在引用组件标签中写内容时，会显示在组件中 -->
+        <slot></slot>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  // 接收父组件传递过来的数据的
+  // props: ['title', 'icon'],
+  // 也可以怎么写,他可以定义接收数据的类型 和 必填的
+  props: {
+    title: { type: String, required: true },
+    icon: { type: String, required: true }
+  }
+}
+</script>
+
+<style lang="scss">
+   // 卡片
+  .card {
+    border-top: solid .027778rem #D4D9DE;
+    border-bottom: solid .027778rem #D4D9DE;
+    .card-head {
+      border-bottom: solid .027778rem #D4D9DE;
+    }
+  }
+</style>
+
+```
+
+2，全局引用：
+
+main.js：
+
+```js
+// 导入 card 组件
+import Card from './components/public/Card.vue'
+Vue.component('m-card', Card)
+```
+
+
+
+3，使用：
+
+```html
+<!-- 封装的组件 -->
+<m-card title="英雄列表" icon="icon-Artifact-yingxiong">
+  123
+</m-card>
+```
+
+![封装简单的card组件](H:\javascript\Vue.js\KingGlorys\md\img\封装简单的card组件.png)
+
+
+
+
+
+## 7. 封装包括内容数据的 卡片 组件
+
+在之前要获取 数据，然后存储到数据库，在获取数据；
+
+ListCard.vue
+
+我们把数据传递到组件中，组件利用循环，把每一个数据循环出来，在 slot 中，利用作用域插槽 把循环后的每行数据，返回到 调用组件的 父组件 中；这样我们就可以操作 循环后的每行数据了。
+
+```html
+<!-- 封装包括数据的卡片组件 -->
+<template>
+  <div class="listCard-content card mt-2 p-2 bg-white">
+    <div class="card-head d-flex pb-2">
+      <!-- 标题图标 -->
+      <i class="font_family mr-1" :class="`${icon}`" ></i>
+      <!-- 标题 -->
+      <span class="fs-xl flex-1">{{title}}</span>
+      <i class="font_family icon-caidan"></i>
+    </div>
+    <div class="card-body mt-1">
+      <!-- 导航文字 -->
+      <div class="nav jc-between">
+        <div class="nav-item" ref="actives" v-for="(item, i) in categories" :key="i" :class="i == index ? 'active' : ''"
+        @click="index = i">
+          <div class="nav-link" @click="activeInfo(i)">{{item.name}}</div>
+        </div>
+      </div>
+      <!-- 轮播列表 -->
+      <div class="nav-list">
+        <Swiper :autoPlay="false" :showIndicator="false" v-if="categories.length > 0" ref="swiper" @transtionend="activeIs">
+          <!-- 循环出和导航一样多的轮播图标签 -->
+          <Slide v-for="(item, i) in categories" :key="i">
+<!-- 里面的数据的展示模式，不是组件定死的，是可以自定义的，但用 slot 标签又不行，因为 slot 标签只是让父组件的数据，可以展示在组件里，但拿不到，子组件里的数据，我们要的是 父组件传递数据给组件，然后组件把数据渲染成列表的那个导航，然后把里面的数据提供给父组件，这样父组件，就可以自己想用什么格式展示数据，都可以，使用 作用域插槽，作用域插槽的作用就是让父组件可以获取到子组件中的数据。 -->
+              <slot name="categories" :category="item"></slot>
+          </Slide>
+        </Swiper>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+// 引入轮播图组件
+import { Swiper, Slide } from 'vue-swiper-component'
+export default {
+  components: {
+    Swiper,
+    Slide
+  },
+  // 传递到 卡片组件的数据
+  props: {
+    icon: { type: String, required: true },
+    title: { type: String, required: true },
+    categories: { type: Array, required: true }
+  },
+  data () {
+    return {
+      index: 0
+    }
+  },
+  methods: {
+    // 点击新闻资讯导航，滑动内容列表
+    activeInfo (index) {
+      this.$refs.swiper.slideTo(index)
+    },
+    // 滑动列表，触发事件
+    activeIs (data) {
+      this.index = data
+    }
+  }
+}
+</script>
+```
+
+
+
+在 home.vue 中的使用：
+
+```html
+<!-- 新闻资讯 -->
+<!-- 卡片组件,传递title，icons，categories 的数据； -->
+<m-list-card title="新闻资讯" icon="icon-xinwen" :categories="newCats">
+  <!-- 具名插槽 和 作用域插槽的使用 -->
+  <template v-slot:categories="{category}">
+    <div class="list d-flex ai-center" v-for="(item, i) in category.newsList" :key="i">
+      <span class="mr-1 orange-border">{{item.categoryName}}</span>
+      <span class="flex-1 ellipsis">{{item.title}}</span>
+      <span class="ml-1 text-grey">{{item.updatedAt | date}}</span>
+    </div>
+  </template>
+</m-list-card>
+```
+
+
+
+## 8. 英雄列表
+
+### 1. 获取英雄数据
+
+```js
+$$('.hero-nav a').map(v => { return v.innerText })  英雄文字
+
+let data1 = { name: $$('.hero-list a h3').map(v => { return v.innerHTML }) }  英雄名字
+
+
+let a = {
+    name: '路边',
+    img: 'xxxx'
+}
+"<a href="//pvp.qq.com/web201605/herodetail/m/167.html" onclick="PTTSendClick('hero','hot_details','热门详情');"><img src="//game.gtimg.cn/images/yxzj/img201606/heroimg/167/167.jpg" width="91px" alt="孙悟空"><h3>孙悟空</h3></a>"
+
+
+"[{"categories":"热门","children":[{"name":"鲁班七号","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/112/112.jpg"]},{"name":"孙悟空","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/167/167.jpg"]},{"name":"后羿","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/169/169.jpg"]},{"name":"韩信","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/150/150.jpg"]},{"name":"铠","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/193/193.jpg"]},{"name":"妲己","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/109/109.jpg"]},{"name":"亚瑟","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/166/166.jpg"]},{"name":"百里守约","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/196/196.jpg"]},{"name":"小乔","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/106/106.jpg"]},{"name":"安琪拉","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/142/142.jpg"]}]},{"categories":"战士","children":[{"name":"赵云","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/107/107.jpg"]},{"name":"墨子","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/108/108.jpg"]},{"name":"钟无艳","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/117/117.jpg"]},{"name":"吕布","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/123/123.jpg"]},{"name":"夏侯惇","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/126/126.jpg"]},{"name":"曹操","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/128/128.jpg"]},{"name":"典韦","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/129/129.jpg"]},{"name":"宫本武藏","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/130/130.jpg"]},{"name":"达摩","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/134/134.jpg"]},{"name":"老夫子","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/139/139.jpg"]},{"name":"关羽","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/140/140.jpg"]},{"name":"程咬金","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/144/144.jpg"]},{"name":"露娜","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/146/146.jpg"]},{"name":"花木兰","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/154/154.jpg"]},{"name":"橘右京","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/163/163.jpg"]},{"name":"亚瑟","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/166/166.jpg"]},{"name":"孙悟空","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/167/167.jpg"]},{"name":"刘备","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/170/170.jpg"]},{"name":"钟馗","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/175/175.jpg"]},{"name":"杨戬","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/178/178.jpg"]},{"name":"雅典娜","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/183/183.jpg"]},{"name":"哪吒","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/180/180.jpg"]},{"name":"铠","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/193/193.jpg"]},{"name":"苏烈","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/194/194.jpg"]},{"name":"裴擒虎","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/502/502.jpg"]},{"name":"狂铁","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/503/503.jpg"]},{"name":"孙策","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/510/510.jpg"]},{"name":"李信","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/507/507.jpg"]},{"name":"盘古","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/529/529.jpg"]},{"name":"云中君","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/506/506.jpg"]},{"name":"曜","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/522/522.jpg"]},{"name":"马超","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/518/518.jpg"]},{"name":"蒙恬","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/527/527.jpg"]}]},{"categories":"法师","children":[{"name":"小乔","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/106/106.jpg"]},{"name":"墨子","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/108/108.jpg"]},{"name":"妲己","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/109/109.jpg"]},{"name":"嬴政","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/110/110.jpg"]},{"name":"高渐离","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/115/115.jpg"]},{"name":"孙膑","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/118/118.jpg"]},{"name":"扁鹊","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/119/119.jpg"]},{"name":"芈月","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/121/121.jpg"]},{"name":"周瑜","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/124/124.jpg"]},{"name":"甄姬","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/127/127.jpg"]},{"name":"武则天","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/136/136.jpg"]},{"name":"貂蝉","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/141/141.jpg"]},{"name":"安琪拉","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/142/142.jpg"]},{"name":"露娜","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/146/146.jpg"]},{"name":"姜子牙","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/148/148.jpg"]},{"name":"王昭君","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/152/152.jpg"]},{"name":"张良","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/156/156.jpg"]},{"name":"不知火舞","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/157/157.jpg"]},{"name":"钟馗","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/175/175.jpg"]},{"name":"诸葛亮","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/190/190.jpg"]},{"name":"干将莫邪","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/182/182.jpg"]},{"name":"女娲","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/179/179.jpg"]},{"name":"杨玉环","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/176/176.jpg"]},{"name":"弈星","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/197/197.jpg"]},{"name":"米莱狄","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/504/504.jpg"]},{"name":"司马懿","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/137/137.jpg"]},{"name":"沈梦溪","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/312/312.jpg"]},{"name":"上官婉儿","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/513/513.jpg"]},{"name":"嫦娥","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/515/515.jpg"]},{"name":"西施","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/523/523.jpg"]}]},{"categories":"坦克","children":[{"name":"廉颇","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/105/105.jpg"]},{"name":"庄周","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/113/113.jpg"]},{"name":"刘禅","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/114/114.jpg"]},{"name":"钟无艳","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/117/117.jpg"]},{"name":"白起","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/120/120.jpg"]},{"name":"芈月","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/121/121.jpg"]},{"name":"吕布","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/123/123.jpg"]},{"name":"夏侯惇","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/126/126.jpg"]},{"name":"达摩","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/134/134.jpg"]},{"name":"项羽","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/135/135.jpg"]},{"name":"程咬金","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/144/144.jpg"]},{"name":"刘邦","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/149/149.jpg"]},{"name":"亚瑟","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/166/166.jpg"]},{"name":"牛魔","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/168/168.jpg"]},{"name":"张飞","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/171/171.jpg"]},{"name":"太乙真人","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/186/186.jpg"]},{"name":"东皇太一","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/187/187.jpg"]},{"name":"铠","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/193/193.jpg"]},{"name":"苏烈","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/194/194.jpg"]},{"name":"梦奇","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/198/198.jpg"]},{"name":"孙策","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/510/510.jpg"]},{"name":"嫦娥","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/515/515.jpg"]},{"name":"猪八戒","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/511/511.jpg"]},{"name":"阿古朵","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/533/533.jpg"]}]},{"categories":"刺客","children":[{"name":"赵云","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/107/107.jpg"]},{"name":"阿轲","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/116/116.jpg"]},{"name":"李白","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/131/131.jpg"]},{"name":"貂蝉","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/141/141.jpg"]},{"name":"韩信","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/150/150.jpg"]},{"name":"兰陵王","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/153/153.jpg"]},{"name":"花木兰","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/154/154.jpg"]},{"name":"不知火舞","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/157/157.jpg"]},{"name":"娜可露露","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/162/162.jpg"]},{"name":"橘右京","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/163/163.jpg"]},{"name":"孙悟空","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/167/167.jpg"]},{"name":"百里守约","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/196/196.jpg"]},{"name":"百里玄策","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/195/195.jpg"]},{"name":"裴擒虎","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/502/502.jpg"]},{"name":"元歌","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/125/125.jpg"]},{"name":"司马懿","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/137/137.jpg"]},{"name":"上官婉儿","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/513/513.jpg"]},{"name":"云中君","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/506/506.jpg"]},{"name":"马超","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/518/518.jpg"]},{"name":"镜","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/531/531.jpg"]}]},{"categories":"射手","children":[{"name":"孙尚香","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/111/111.jpg"]},{"name":"鲁班七号","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/112/112.jpg"]},{"name":"马可波罗","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/132/132.jpg"]},{"name":"狄仁杰","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/133/133.jpg"]},{"name":"后羿","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/169/169.jpg"]},{"name":"李元芳","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/173/173.jpg"]},{"name":"虞姬","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/174/174.jpg"]},{"name":"成吉思汗","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/177/177.jpg"]},{"name":"黄忠","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/192/192.jpg"]},{"name":"百里守约","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/196/196.jpg"]},{"name":"公孙离","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/199/199.jpg"]},{"name":"伽罗","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/508/508.jpg"]},{"name":"蒙犽","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/524/524.jpg"]}]},{"categories":"辅助","children":[{"name":"庄周","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/113/113.jpg"]},{"name":"刘禅","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/114/114.jpg"]},{"name":"孙膑","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/118/118.jpg"]},{"name":"姜子牙","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/148/148.jpg"]},{"name":"牛魔","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/168/168.jpg"]},{"name":"张飞","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/171/171.jpg"]},{"name":"蔡文姬","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/184/184.jpg"]},{"name":"太乙真人","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/186/186.jpg"]},{"name":"大乔","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/191/191.jpg"]},{"name":"鬼谷子","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/189/189.jpg"]},{"name":"明世隐","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/501/501.jpg"]},{"name":"杨玉环","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/176/176.jpg"]},{"name":"盾山","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/509/509.jpg"]},{"name":"瑶","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/505/505.jpg"]},{"name":"鲁班大师","avatar":["https://game.gtimg.cn/images/yxzj/img201606/heroimg/525/525.jpg"]}]}]"
+```
+
+
+
+## 9. 新闻资讯详情页面
+
+在页底下的相关连接，给他设置了 `router-link` 到相应的页面上，但点击后，没有进行页面的跳转（数据刷新），是因为他和 现在正在浏览的 新闻详情 使用了同一个 组件，所以就不会进行跳转了，只是改变了 浏览器的地址栏中的 id：
+
+![不会重新加载组件内容](H:\javascript\Vue.js\KingGlorys\md\img\不会重新加载组件内容.png)
+
+所以，要在 组件中，监听传递过来的 id 的变化，使用 watch 监听属性，来监听
+
+
+
+http://localhost:3000/public/upload_8dacbbd82bc94cf3eb8c1e45c6bc97df.jpg
+
+http://localhost:3000\public\upload_8dacbbd82bc94cf3eb8c1e45c6bc97df.jpg
+
+
+
 # 4. serve 端
 
 ## 1.初始化项目
@@ -2575,9 +3036,291 @@ module.exports = async (req, res) => {
 
 
 
+## 19. 一次性录入文章数据
+
+1，在官网页面，分别浏览5个分类的数据，然后在浏览器控制台获取每个列的 innerHTML 文字；
+
+![选中文字](H:\javascript\Vue.js\KingGlorys\md\img\选中文字.png)
+
+可以看到这里的列表在 ul 他的类名为 `news_list 他下面的 title 就是我们想要的文字了，所以就可以这样获取到：
+
+```js
+$$('.news_list .title')
+```
+
+就可以获取到新闻资讯的每一列的文字了，但前面的 5 行数据是随机获取的，所以我们要跳过前面5条数据：
+
+```js
+$$('.news_list .title').slice(5)
+```
+
+然后，利用 map 把数据进行映射，获取每一项的 innerHTML：
+
+```js
+$$('.news_list .title').slice(5).map(v => { return v.innerHTML})
+```
+
+![获取文字](H:\javascript\Vue.js\KingGlorys\md\img\获取文字.png)
 
 
-401 用户的
+
+2，在 web 路由中，向文章插入数据，标题就是我们获取到的这些数据；
+
+serve > router > web.js
+
+```js
+// 处理前端数据的 父路由
+module.exports = (app) => {
+  const express = require('express');
+  // 导入文章 和 分类 集合
+  const Article = require('../model/Article');
+  const Category = require('../model/Category');
+
+  // 设置子路由
+  const web = express.Router();
+  // 设置 前端页面的 父路由
+  app.use('/web', web);
+
+  // 设置 /web/list 接口  
+  web.get('/list', async (req, res) => {
+    // 找出新闻资讯类
+    const parent = await Category.find({
+      name: '新闻资讯'
+    })
+    /**[ { _id: 5f1ee8f5546e42061047581e, name: '新闻资讯', __v: 0 } ] */
+    // 查询出 和 新闻资讯 进行关联的数据
+    const data = await Category.find().where({
+      parent: parent
+    });
+    const dataList = ["英雄调整情报丨杨戬/苏烈加强，阿古朵降温，蔡文姬优化", "主播入驻游戏圈，发帖赢大奖！", "《王者荣耀》品牌代言人首登场，欢迎真爱玩家加入战场", "“缘起峡谷，情定七夕”——《王者荣耀》七夕告白季，邀你来峡谷，表达爱！", "叮！你的潇潇子已抵达王者营地", "8月18日神秘商店维护完成公告", "8月18日服务器维护公告", "8月18日神秘商店维护公告", "英雄平衡性公告丨杨戬加强，阿古朵降温，蔡文姬优化", "8月18日全服不停机更新公告", "恭喜TS夺得世冠总冠军，回馈福利来袭，典韦-蓝屏警告星元上新", "【看世冠对决 赢豪华大礼】活动公告", "应援世冠得好礼，墨子两款皮肤重塑完成即将登场", "夏日盛典开启，新英雄阿古朵登场！送皮肤、抽内测惊喜好礼享不停", "【三分探险】活动开启公告", "2020年王者荣耀世界冠军杯总决赛门票8月10日正式开售", "8月7日【比赛服】版本更新公告", "7月29日【比赛服】版本更新公告", "7月13日【比赛服】版本更新公告", "2020年王者荣耀世界冠军杯小组赛赛程出炉"];
+    const newList = dataList.map(item => {
+      // 随机选取，把获取到的和新闻资讯管理的数据，进行随机的排序，然后选取前2个值；
+      const randmCats = data.slice(0).sort((a, b) => Math.random() - 0.5);
+      return {
+        categories: randmCats.slice(0, 2),
+        title: item
+      };
+    })
+    // 删除文章的所有数据
+    await Article.deleteMany({});
+    // 插入数据
+    await Article.insertMany(newList);
+    res.send(newList);
+  })
+}
+
+```
+
+获取到的和 新闻资讯 管理的数据；（where）
+
+![和新闻资讯关联的数据](H:\javascript\Vue.js\KingGlorys\md\img\和新闻资讯关联的数据.png)
+
+## 20. 查询新闻资讯数据
+
+录进数据后，就可以发起请求了，获取和我们在 `Home.vue` 中定义的数据一样的数据格式：
+
+1，创建 新闻资讯 接口：
+
+serve > router > web.js
+
+```js
+// 处理前端数据的 父路由
+module.exports = (app) => {
+  const express = require('express');
+
+  // 设置子路由
+  const web = express.Router();
+  // 设置 前端页面的 父路由
+  app.use('/web', web);
+
+  // 新闻资讯列表数据
+  web.get('/news/list', require('./web/newsList'));
+}
+```
+
+2， 创建 newsList.js 文件，组成返回数据 和 我们的模拟数据一样的数据格式：
+
+```js
+我们模式的数据：
+newCats: [
+    {
+      name: '热门',
+      newList: new Array(5).fill({}).map(item => ({
+        categoryName: '公告',
+        title: '游戏家中国行·王者零距离”活动重启说明',
+        date: '08/17'
+      }))
+    },
+]
+```
+
+接口处理函数体：
+
+```js
+// 新闻资讯接口
+module.exports = async (req, res) => {
+
+}
+```
+
+方法一： 使用 分类集合 使用 子分类：
+
+serve > model > Category.js
+
+```js
+// category 类别的集合
+const mongoose = require("mongoose");
+
+// 设置集合规则
+const categorySchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, 'name是必填项']
+  },
+  parent: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Category'
+  },
+  icon: {
+    type: String
+  }
+})
+
+// 子分类, 和 本身进行关联
+categorySchema.virtual('children', {
+    localField: '_id',
+    foreignField: 'parent',
+    justOne: false,
+    ref: 'Category'
+})
+
+// 子分类，和 文章进行关联
+categorySchema.virtual('newsList', {
+    localField: '_id',
+    foreignField: 'categories',
+    justOne: false,
+    ref: 'Article'
+})
+
+// 创建集合
+const Category = mongoose.model('Category', categorySchema);
+
+// 导出集合
+module.exports = Category;
+
+```
+
+
+
+ 然后，在 newsList.js 中，才可以使用他来连续查询数据：
+
+```js
+// 新闻资讯接口
+module.exports = async (req, res) => {
+  const Article = require('../..//model/Article');
+  const Category = require('../../model/Category');
+    
+  const newData = await Category.find({name: '新闻资讯'}).populate({
+      path: children,
+      populate: ({
+          path: newsList
+      })
+  }).lean()
+}
+```
+
+查询出来的数据为：
+
+<img src="H:\javascript\Vue.js\KingGlorys\md\img\集合的字分类，关联，连续查询.png" alt="集合的字分类，关联，连续查询" style="zoom: 200%;" />
+
+
+
+方法二： 使用 mongoodb 的聚合，来处理，他可以做到同样的功能，性能也比较好：
+
+1，不需要在 `Category.js` 集合中书写子分类了。
+
+2，在 newsList.js 中使用 聚合查询出数据：
+
+1. 查询出 顶级的分类，新闻资讯：
+
+   ```js
+   const parent = await Category.findOne({name: '新闻资讯'});
+   ```
+
+2. 使用聚合，首先过滤掉其他的 分类，剩属于 新闻资讯 关联的分类了：：
+
+   ```js
+   const newData = await Category.aggregate([
+       { $match: { parent: parent} },
+   ])
+   
+   res.send(newsData);
+   ```
+
+   ![聚合管道 $lookup](H:\javascript\Vue.js\KingGlorys\md\img\聚合管道 $lookup.png)
+
+3. 进行数据的关联查询：
+
+   ```js
+   const newData = await Category.aggregate([
+       { $match: { parent: parent} },
+       { 
+          $lookup: {
+             from: 'article',
+             localField: '_id',
+             foreighField: 'categories',
+             as: 'newsList'
+          }
+       },
+       { 
+         $addFields: {
+           newsList: { $slice: ['$newsList', 5] }  // 限制查询的数据
+         }
+       }
+   ])
+   
+   res.send(newsData);	
+   ```
+
+   ![查询](H:\javascript\Vue.js\KingGlorys\md\img\查询.png)
+
+还是可以实现和 之前一样的效果的。
+
+
+
+4，给数据添加一个 热门数据，通过 map方法添加，先获取个分类的 id，然后，根据这几个 id ，去文章集合中查询数据，限制5个；
+
+```js
+  // 在数据中，添加一个热门
+  const listId = newsData.map(v => v._id);
+  newsData.unshift({
+    name: '热门',
+    newsList: await Article.find().where({
+      categories: { $in: listId }
+    }).populate('categories').limit(5).lean()
+  })
+```
+
+
+
+5，给每个分类的 newsList 添加 `categoryName` 属性，为当前分类的name，但 热门 除外，因为热门里的数据，都是在 不同的 分类中获取的。
+
+使用 2 层 map 来修改。
+
+
+
+```js
+// 添加 categories 类别，在热门下，显示 categories 的第一个 分类 ；在 公共下，显示公告等等
+newsData.map(v => {
+    v.newsList.map(val => {
+      val.categoryName = (v.name == '热门') ? val.categories[0].name : v.name; 
+    })
+})
+```
+
+
+
+
 
 
 
@@ -2735,4 +3478,70 @@ module.exports = (req, res) => {
  console.log(app.get('secret'));  // 没有这个 app
 }
 ```
+
+
+
+## 3. 改变 vue/lic 项目端口号：
+
+修改使用 vue/lic 搭建项目打开项目时，所开启的端口号：
+
+因为 vue/lic 是和 webpack 一起搭配使用的，所以一些配置和 webpack 是一样的；
+
+修改端口号：
+
+项目更目录 > package.json
+
+```js
+  "scripts": {
+    "serve": "vue-cli-service serve --port 8181",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint"
+  }
+```
+
+直接写在快捷运行命令后；
+
+
+
+## 4. 在浏览器F12 中，获取页面的元素
+
+使用 `$$('选择器')` 他就像 `document.querySelector('')`一样；
+
+```js
+$$('p'); // 选中页面上所有的 p 标签；
+```
+
+
+
+## 5. 背景图片的路径问题
+
+在发起请求后，获取到 背景图片的路径：
+
+![banner路径](H:\javascript\Vue.js\KingGlorys\md\img\banner路径.png)
+
+ 然后在 html 中，使用行内式，书写背景图片：
+
+```html
+<!-- 图片展示 -->
+<div class="banner" :style="{'backgroundImage':`url(require(${model.banner}))`}">
+</div>
+```
+
+在浏览器中，查看元素的路径是这样的：
+
+![错误的路径](H:\javascript\Vue.js\KingGlorys\md\img\错误的路径.png)
+
+为什么，路径中没有斜杠了呢 ？
+
+
+
+
+
+# 记：
+
+
+
+2. npm install require-all 把某个文件夹下的所有文件都进入；
+
+
 
